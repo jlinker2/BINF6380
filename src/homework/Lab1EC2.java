@@ -36,6 +36,11 @@ public class Lab1EC2
 				}
 			}
 		}
+	/*
+	 * I had a lot of issues with arrays (particularly adding to arrays, 
+	 * since they have a fixed size. The idea for using an array list and the trick 
+	 * below to get it back into a string array came from stackoverflow.  
+	 */
 		threemerList = allThreemers.toArray(new String[0]);
 	}
 	/*
@@ -194,6 +199,11 @@ public class Lab1EC2
 		chiTable(threemerList);
 		for (int j = 0; j < 10000; j++)
 		{
+			/*
+			 * There must be a better way to do this, but I'm trying to 
+			 * wipe the observed array clean before running the experiment
+			 * again.
+			 */
 			Arrays.fill(observed, 0); 
 			for (int x = 0; x < 10000; x++)
 			{
