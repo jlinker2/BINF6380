@@ -9,7 +9,7 @@ public class Lab1EC2
 {
 /* 
  * Hoping that by the end of the semester there will be many 
- * fewer "static"s in my code. For now I'm just glad it works.
+ * fewer "static"s in my code. For now I'm just glad it works. 
  */
 	static String[] nucleotides = { "A", "C", "G", "T" };
 	static ArrayList<String> allThreemers = new ArrayList<String>();
