@@ -30,12 +30,12 @@ public class Lab2QuizEC
 		if(Arrays.asList(SHORT_NAMES).indexOf(answer)==(Arrays.asList(FULL_NAMES).indexOf(prompt)))
 		{
 			score++;
-			correct[Arrays.asList(SHORT_NAMES).indexOf(answer)] = correct[Arrays.asList(SHORT_NAMES).indexOf(answer)]+1;
+			correct[Arrays.asList(FULL_NAMES).indexOf(prompt)] = correct[Arrays.asList(FULL_NAMES).indexOf(prompt)]+1;
 			System.out.println("Correct! " + prompt + " is " + answer + ".");
 		}
 		else
 		{
-			incorrect[Arrays.asList(SHORT_NAMES).indexOf(answer)] = incorrect[Arrays.asList(SHORT_NAMES).indexOf(answer)]+1;
+			incorrect[Arrays.asList(FULL_NAMES).indexOf(prompt)] = incorrect[Arrays.asList(FULL_NAMES).indexOf(prompt)]+1;
 			System.out.println("Wrong! The correct abbreviation for " + prompt + " is " 
 					+ SHORT_NAMES[Arrays.asList(FULL_NAMES).indexOf(prompt)] + ".");
 		}
@@ -77,8 +77,6 @@ public class Lab2QuizEC
 		}
 		
 	System.out.println("Test ends with a score of " + score + ".");	
-//	System.out.println(Arrays.toString(correct));
-//	System.out.println(Arrays.toString(incorrect));
 	for (int x=0; x<FULL_NAMES.length; x++)
 	{
 		System.out.println(FULL_NAMES[x] +" (" + SHORT_NAMES[x] +"): " + correct[x] +" correct, " + incorrect[x] + " incorrect.");
