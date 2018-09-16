@@ -71,6 +71,7 @@ public class Lab2QuizEC
 			System.out.println("Time: " + elapse + " out of " + duration + " seconds.");
 			}
 		}
+		
 	System.out.println("Test ends with a score of " + score + ".");	
 	}
 }
