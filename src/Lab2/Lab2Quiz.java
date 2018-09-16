@@ -40,7 +40,15 @@ public class Lab2Quiz
 	public static void main(String[] args)
 	{
 		long start = System.currentTimeMillis();
-		long end = (start+30000);
+		double duration;
+		if (args.length==0)
+		{
+			duration=30;
+		}
+		else {
+			duration = Double.parseDouble(args[0]);
+		}
+		long end = (long) (start+1000*duration);
 		while (System.currentTimeMillis()<end)
 		{
 			String prompt = chooseNextFullName();
@@ -60,7 +68,7 @@ public class Lab2Quiz
 			checkAnswer(prompt,answerCharacter);
 			System.out.println("Your current score is: "+ score + ".");
 			long elapse = (System.currentTimeMillis() - start)/1000; 
-			System.out.println("Time: " + elapse + " out of 30 seconds.");
+			System.out.println("Time: " + elapse + " out of " + duration + " seconds.");
 			}
 		}
 		
