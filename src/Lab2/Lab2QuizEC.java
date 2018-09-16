@@ -15,6 +15,8 @@ public class Lab2QuizEC
 		"leucine", "lysine", "methionine", "phenylalanine", "proline",
 		"serine","threonine","tryptophan", "tyrosine", "valine"};
 	private static int score = 0;
+	private static int[] correct = new int[20];
+	private static int[] incorrect = new int[20];
 		
 	public static String chooseNextFullName()
 	{
@@ -28,10 +30,12 @@ public class Lab2QuizEC
 		if(Arrays.asList(SHORT_NAMES).indexOf(answer)==(Arrays.asList(FULL_NAMES).indexOf(prompt)))
 		{
 			score++;
-			System.out.println("Correct! " + answer + " is the abbreviation of " + prompt + ".");
+			correct[Arrays.asList(SHORT_NAMES).indexOf(answer)] = correct[Arrays.asList(SHORT_NAMES).indexOf(answer)]+1;
+			System.out.println("Correct! " + prompt + " is " + answer + ".");
 		}
 		else
 		{
+			incorrect[Arrays.asList(SHORT_NAMES).indexOf(answer)] = incorrect[Arrays.asList(SHORT_NAMES).indexOf(answer)]+1;
 			System.out.println("Wrong! The correct abbreviation for " + prompt + " is " 
 					+ SHORT_NAMES[Arrays.asList(FULL_NAMES).indexOf(prompt)] + ".");
 		}
@@ -73,5 +77,11 @@ public class Lab2QuizEC
 		}
 		
 	System.out.println("Test ends with a score of " + score + ".");	
+//	System.out.println(Arrays.toString(correct));
+//	System.out.println(Arrays.toString(incorrect));
+	for (int x=0; x<FULL_NAMES.length; x++)
+	{
+		System.out.println(FULL_NAMES[x] +" (" + SHORT_NAMES[x] +"): " + correct[x] +" correct, " + incorrect[x] + " incorrect.");
+	}
 	}
 }

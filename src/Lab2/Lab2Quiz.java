@@ -48,12 +48,11 @@ public class Lab2Quiz
 				{
 					System.out.println("Wrong! The correct abbreviation for " + prompt + " is "
 							+ SHORT_NAMES[Arrays.asList(FULL_NAMES).indexOf(prompt)] + ".");
-					System.out.println("You finished with a score of " + score + ".");
 					break;
 				} else
 				{
 					score++;
-					System.out.println("Correct! " + answer + " is the abbreviation of " + prompt + ".");
+					System.out.println("Correct! " + prompt + " is " + answer + ".");
 					System.out.println("Your current score is: " + score + ".");
 					long elapse = (System.currentTimeMillis() - start) / 1000;
 					System.out.println("Time: " + elapse + " out of " + duration + " seconds.");
