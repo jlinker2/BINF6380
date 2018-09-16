@@ -15,7 +15,7 @@ public class Lab2Quiz
 		"leucine", "lysine", "methionine", "phenylalanine", "proline",
 		"serine","threonine","tryptophan", "tyrosine", "valine"};
 	private static int score = 0;
-	
+		
 	public static String chooseNextFullName()
 	{
 		Random random = new Random();
@@ -63,6 +63,7 @@ public class Lab2Quiz
 			System.out.println("Time: " + elapse + " out of 30 seconds.");
 			}
 		}
+		
 	}
 
 }
