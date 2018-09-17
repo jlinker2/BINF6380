@@ -72,7 +72,7 @@ public class FastaPivot
 		System.out.println(numA);	// for testing
 		System.out.println(numC);	// for testing
 		System.out.println(numG);	// for testing
-		System.out.println(numT);	// for testing
+		System.out.println(numT);	// for testing  
 	}
 
 }
