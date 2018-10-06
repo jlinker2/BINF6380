@@ -1,21 +1,30 @@
 package lab4;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class FastaSequence
 {
 	private final String header;
 	private final String sequence;
-
+	
 	public FastaSequence(String header, String sequence)
 	{
 		this.header = header;
 		this.sequence = sequence;
 	}
-
+	
+	// static factory for FastaSequence object
 	public static FastaSequence makeSequence(String header, String sequence)
 	{
 		return new FastaSequence(header, sequence);
@@ -48,6 +57,7 @@ public class FastaSequence
 		return (float) count / (float) this.sequence.length();
 	}
 
+	// takes a file 
 	public static List<FastaSequence> readFastaFile(String filepath) throws Exception
 	{
 		List<FastaSequence> FastaList = new ArrayList<FastaSequence>();
@@ -87,9 +97,64 @@ public class FastaSequence
 		return FastaList;
 	}
 
+	public static void writeUnique(File inFile, File outFile) throws Exception
+	{
+		List<FastaSequence> fastaList = FastaSequence.readFastaFile(inFile.toString());
+
+		HashMap<String, Integer> map = new LinkedHashMap<String, Integer>();
+
+		for (int x = 0; x < fastaList.size(); x++)
+		{
+			String sequence2 = fastaList.get(x).getSequence();
+			Integer count = map.get(sequence2);
+
+			if (count == null)
+			{
+				count = 0;
+			}
+			count++;
+
+			map.put(sequence2, count);
+		}
+		LinkedHashMap<String, Integer> sorted = sortByValue(map);
+		
+		BufferedWriter writer = new BufferedWriter(new FileWriter(outFile));
+		for (String seq : sorted.keySet())
+		{
+			String key = seq.toString();
+			String value = sorted.get(seq).toString();
+			writer.write(">" + value + "\n" + key);
+			writer.newLine();
+		}
+		writer.close();
+	}
+
+	private static LinkedHashMap<String, Integer> sortByValue(Map<String, Integer> unsorted)
+	{
+		ArrayList<Map.Entry<String, Integer>> list = new ArrayList<Map.Entry<String, Integer>>(unsorted.entrySet());
+
+		Comparator<Map.Entry<String, Integer>> valueComparator = new Comparator<Map.Entry<String, Integer>>()
+		{
+			public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2)
+			{
+				return Integer.compare(o1.getValue(), o2.getValue());
+			}
+
+		};
+		Collections.sort(list, valueComparator);
+
+		LinkedHashMap<String, Integer> sorted = new LinkedHashMap<String, Integer>();
+		for (Map.Entry<String, Integer> entry : list)
+		{
+			sorted.put(entry.getKey(), entry.getValue());
+		}
+		return sorted;
+
+	}
+
 	public static void main(String[] args) throws Exception
 	{
-		List<FastaSequence> fastaList = FastaSequence.readFastaFile("C:\\Users\\reeli\\git\\BINF6380\\sample2.fa");
+		List<FastaSequence> fastaList = FastaSequence.readFastaFile("inFile");
 
 		for (FastaSequence fs : fastaList)
 		{
@@ -97,6 +162,7 @@ public class FastaSequence
 			System.out.println(fs.getSequence());
 			System.out.println(fs.getGCRatio());
 		}
+		writeUnique(new File("inFile"), new File("outFile"));
 
 	}
 
