@@ -11,6 +11,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 public class AminoQuiz extends JFrame
 {
@@ -37,12 +38,10 @@ public class AminoQuiz extends JFrame
 	private volatile static int timerSet = DEFAULT_TIMER;
 	private volatile static int timeLeft;
 	private volatile static boolean gameOver = false;
-	private Thread worker;
-	
+	private volatile static boolean stop = false;
 
 	private JButton startButton = new JButton("Start!");
 	private JButton timerButton = new JButton("Add 10 seconds");
-	private JButton resetButton = new JButton("Reset");
 
 	private JPanel getBottomPanel()
 	{
@@ -67,7 +66,7 @@ public class AminoQuiz extends JFrame
 			}
 		});
 		// set up the RESET button and add action listener
-	
+		JButton resetButton = new JButton("Reset");
 		resetButton.setMnemonic('R');
 		resetButton.setToolTipText("Reset the quiz.");
 		resetButton.addActionListener(new ActionListener()
@@ -81,6 +80,7 @@ public class AminoQuiz extends JFrame
 					timerSet = DEFAULT_TIMER;
 					score = 0;
 					gameOver = false;
+					stop = true;
 					promptText.setText("");
 					answerText.setText("");
 					answerText.setFocusable(true);
@@ -106,9 +106,9 @@ public class AminoQuiz extends JFrame
 		{
 			startButton.setEnabled(false);
 			timerButton.setEnabled(false);
-			resetButton.setEnabled(false);
+
 			// start timer
-			worker = new Thread(new timerActionRunnable());
+			Thread worker = new Thread(new timerActionRunnable());
 			worker.start();
 			// deliver first prompt
 			Random random = new Random();
@@ -142,7 +142,7 @@ public class AminoQuiz extends JFrame
 					prompt = FULL_NAMES[x];
 					answerText.setText("");
 					updateTextFields();
-				} 
+				}
 			}
 		}
 	}
@@ -170,21 +170,44 @@ public class AminoQuiz extends JFrame
 
 			try
 			{
+				stop = false;
 				long now = System.currentTimeMillis();
 				long end = now + timerSet * 1000;
 				int holder = (int) ((end - System.currentTimeMillis()) / 1000);
-				while (System.currentTimeMillis() <= end)
+				while (System.currentTimeMillis() <= end && !stop)
 				{
 					if ((int) ((end - System.currentTimeMillis()) / 1000) != holder)
 					{
 						holder = (int) ((end - System.currentTimeMillis()) / 1000);
 						timeLeft = (int) ((end - System.currentTimeMillis()) / 1000);
 						timerText.setText("Time: " + timeLeft + " of " + timerSet + " seconds");
+						Thread.sleep(100);
 					}
 				}
+				if (!stop)
+				{
+					SwingUtilities.invokeAndWait(new EndGameActionRunnable());
+				}
+
+			} catch (
+
+			Exception ex)
+			{
+				ex.printStackTrace();
+			}
+
+		}
+
+	}
+
+	private class EndGameActionRunnable implements Runnable
+	{
+		public void run()
+		{
+
+			try
+			{
 				gameOver = true;
-				resetButton.setEnabled(true);
-				
 				answerText.setText("Game Over!");
 				answerText.setFocusable(false);
 				promptText.setText("");
