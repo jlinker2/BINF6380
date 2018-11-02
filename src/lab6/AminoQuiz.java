@@ -2,7 +2,6 @@ package lab6;
 
 import java.util.Arrays;
 import java.util.Random;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -143,12 +142,7 @@ public class AminoQuiz extends JFrame
 					prompt = FULL_NAMES[x];
 					answerText.setText("");
 					updateTextFields();
-				} else
-				{
-					answerText.setText("Game Over!");
-					answerText.setFocusable(false);
-					resultsPane();
-				}
+				} 
 			}
 		}
 	}
@@ -190,6 +184,13 @@ public class AminoQuiz extends JFrame
 				}
 				gameOver = true;
 				resetButton.setEnabled(true);
+				
+				answerText.setText("Game Over!");
+				answerText.setFocusable(false);
+				promptText.setText("");
+				evaluationText.setText("");
+				scoreText.setText("");
+				resultsPane();
 
 			} catch (
 
