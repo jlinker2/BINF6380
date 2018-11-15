@@ -27,7 +27,7 @@ public class PrimeNumGen2 extends JFrame
 	private volatile boolean cancel = false;
 	private final PrimeNumGen2 thisFrame;
 	private List<Integer> list = Collections.synchronizedList(new ArrayList<Integer>());
-	private final int NUMBER_OF_PROCESSORS = 4;
+	private final int NUMBER_OF_PROCESSORS = 12;
 	private volatile AtomicInteger count = new AtomicInteger(0);
 	private volatile AtomicBoolean done = new AtomicBoolean(false);
 
@@ -100,33 +100,7 @@ public class PrimeNumGen2 extends JFrame
 					new Thread(new UpdateText(startTime, max)).start();
 
 					//start prime threads
-					Semaphore s = new Semaphore(NUMBER_OF_PROCESSORS);
-					for (int x = 0; x < NUMBER_OF_PROCESSORS; x++)
-					{
-						s.tryAcquire();
-						new Thread(new UserInput(max, s)).start();
-
-					}
-					//gather up licenses 
-					for (int i = 0; i < NUMBER_OF_PROCESSORS; i++)
-					{
-						try
-						{
-							s.acquire();
-
-						} catch (InterruptedException e1)
-						{
-
-							e1.printStackTrace();
-							System.out.println("I tried to aquire and failed.");
-						}
-
-					}
-					
-					//tell the updater that we're done
-					done = new AtomicBoolean(true);
-					//tell the programmer that we're done
-					System.out.println(done);
+					new Thread(new LaunchWorkers(max)).start();
 
 				}
 			}
@@ -179,13 +153,13 @@ public class PrimeNumGen2 extends JFrame
 			}
 
 			final StringBuffer buff = new StringBuffer();
-
+			Collections.sort(list);
 			for (Integer i2 : list)
 				buff.append(i2 + "\n");
 
 			if (cancel)
 				buff.append("cancelled\n");
-
+			buff.append("Number of primes: " + list.size() + "\n");
 			float time = (System.currentTimeMillis() - startTime) / 1000f;
 			buff.append("Time = " + time + " seconds ");
 
@@ -223,7 +197,7 @@ public class PrimeNumGen2 extends JFrame
 
 			for (int i = threadID; i < max && !cancel; i = i + NUMBER_OF_PROCESSORS)
 			{
-				// done.set(false);
+
 				if (isPrime(i))
 				{
 					list.add(i);
@@ -236,4 +210,51 @@ public class PrimeNumGen2 extends JFrame
 		}// end run
 
 	} // end UserInput
+	
+	private class LaunchWorkers implements Runnable
+	{
+		final int max;
+		private LaunchWorkers (int max)
+		{
+			this.max = max;
+		}
+
+		public void run()
+		{
+
+			Semaphore s = new Semaphore(NUMBER_OF_PROCESSORS);
+			for (int x = 0; x < NUMBER_OF_PROCESSORS; x++)
+			{
+				s.tryAcquire();
+				new Thread(new UserInput(max, s)).start();
+
+			}
+			
+				
+			//gather up licenses 
+			for (int i = 0; i < NUMBER_OF_PROCESSORS; i++)
+			{
+				try
+				{
+					s.acquire();
+
+				} catch (InterruptedException e1)
+				{
+
+					e1.printStackTrace();
+					System.out.println("I tried to aquire and failed.");
+				}
+
+			}
+			
+			//tell the updater that we're done
+			done = new AtomicBoolean(true);
+			//tell the programmer that we're done
+			System.out.println(done);	
+
+			
+
+		}// end run
+
+	} // end acquireLicenses
 }
