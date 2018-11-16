@@ -27,7 +27,7 @@ public class PrimeNumGen2 extends JFrame
 	private volatile boolean cancel = false;
 	private final PrimeNumGen2 thisFrame;
 	private List<Integer> list = Collections.synchronizedList(new ArrayList<Integer>());
-	private final int NUMBER_OF_PROCESSORS = 12;
+	private final int NUM_WORKER_THREADS = 47;
 	private volatile AtomicInteger count = new AtomicInteger(0);
 	private volatile AtomicBoolean done = new AtomicBoolean(false);
 
@@ -48,7 +48,7 @@ public class PrimeNumGen2 extends JFrame
 		this.thisFrame = this;
 		cancelButton.setEnabled(false);
 		aTextField.setEditable(false);
-		setSize(400, 200);
+		setSize(500, 200);
 		setLocationRelativeTo(null);
 		// kill java VM on exit
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -63,6 +63,7 @@ public class PrimeNumGen2 extends JFrame
 		public void actionPerformed(ActionEvent arg0)
 		{
 			cancel = true;
+
 		}
 	}
 
@@ -78,6 +79,12 @@ public class PrimeNumGen2 extends JFrame
 				String num = JOptionPane.showInputDialog("Enter a large integer");
 				Integer max = null;
 				final long startTime;
+				list.clear();
+				cancel = false;
+				done = new AtomicBoolean(false);
+				primeButton.setEnabled(false);
+				cancelButton.setEnabled(true);
+				startTime = System.currentTimeMillis();
 
 				try
 				{
@@ -91,15 +98,12 @@ public class PrimeNumGen2 extends JFrame
 				if (max != null)
 				{
 					aTextField.setText("");
-					primeButton.setEnabled(false);
-					cancelButton.setEnabled(true);
-					cancel = false;
-					startTime = System.currentTimeMillis();
+					count = new AtomicInteger(0);
 
 					// start update thread here
 					new Thread(new UpdateText(startTime, max)).start();
 
-					//start prime threads
+					// start prime threads
 					new Thread(new LaunchWorkers(max)).start();
 
 				}
@@ -137,9 +141,9 @@ public class PrimeNumGen2 extends JFrame
 				if (System.currentTimeMillis() - lastUpdate > 500)
 				{
 					float time = (System.currentTimeMillis() - startTime) / 1000f;
-					final String outString = "Found " + list.size() + " of " + max + " " + time + " seconds ";
-					System.out.println("while loop");
-					SwingUtilities.invokeLater( new Runnable()
+					final String outString = "Found " + list.size() + " primes less than " + max + " in " + time
+							+ " seconds ";
+					SwingUtilities.invokeLater(new Runnable()
 					{
 						@Override
 						public void run()
@@ -159,7 +163,7 @@ public class PrimeNumGen2 extends JFrame
 
 			if (cancel)
 				buff.append("cancelled\n");
-			buff.append("Number of primes: " + list.size() + "\n");
+			buff.append("Number of primes less than " + max + ": " + list.size() + "\n");
 			float time = (System.currentTimeMillis() - startTime) / 1000f;
 			buff.append("Time = " + time + " seconds ");
 
@@ -177,7 +181,7 @@ public class PrimeNumGen2 extends JFrame
 				}
 			});
 		}
-	}
+	}// end UpdateText
 
 	private class UserInput implements Runnable
 	{
@@ -195,7 +199,7 @@ public class PrimeNumGen2 extends JFrame
 
 			int threadID = count.getAndIncrement();
 
-			for (int i = threadID; i < max && !cancel; i = i + NUMBER_OF_PROCESSORS)
+			for (int i = threadID; i < max && !cancel; i = i + NUM_WORKER_THREADS)
 			{
 
 				if (isPrime(i))
@@ -210,11 +214,12 @@ public class PrimeNumGen2 extends JFrame
 		}// end run
 
 	} // end UserInput
-	
+
 	private class LaunchWorkers implements Runnable
 	{
 		final int max;
-		private LaunchWorkers (int max)
+
+		private LaunchWorkers(int max)
 		{
 			this.max = max;
 		}
@@ -222,17 +227,17 @@ public class PrimeNumGen2 extends JFrame
 		public void run()
 		{
 
-			Semaphore s = new Semaphore(NUMBER_OF_PROCESSORS);
-			for (int x = 0; x < NUMBER_OF_PROCESSORS; x++)
+			Semaphore s = new Semaphore(NUM_WORKER_THREADS);
+
+			// launch threads
+			for (int x = 0; x < NUM_WORKER_THREADS; x++)
 			{
 				s.tryAcquire();
 				new Thread(new UserInput(max, s)).start();
-
 			}
-			
-				
-			//gather up licenses 
-			for (int i = 0; i < NUMBER_OF_PROCESSORS; i++)
+
+			// gather up licenses - this part takes a while
+			for (int i = 0; i < NUM_WORKER_THREADS; i++)
 			{
 				try
 				{
@@ -246,15 +251,11 @@ public class PrimeNumGen2 extends JFrame
 				}
 
 			}
-			
-			//tell the updater that we're done
-			done = new AtomicBoolean(true);
-			//tell the programmer that we're done
-			System.out.println(done);	
 
-			
+			// tell the updater that we're done
+			done = new AtomicBoolean(true);
 
 		}// end run
 
-	} // end acquireLicenses
+	} // end LaunchWorkers
 }
